@@ -1,0 +1,74 @@
+apply plugin: 'com.android.model.application'
+
+model {
+    repositories {
+        prebuilt(PrebuiltLibraries) {
+            gst {
+                headers.srcDir "src/main/jni/include"
+                binaries.withType(SharedLibraryBinary) {
+                    sharedLibraryFile = file("libs/libgstplayer.so")
+                    sharedLibraryFile = file("libs/libgstreamer_android.so")
+                }
+            }
+        }
+    }
+    android {
+        compileSdkVersion 23
+        buildToolsVersion "23.0.2"
+
+        defaultConfig {
+            applicationId "com.visualdefence.gstreamertest2"
+            minSdkVersion.apiLevel 19
+            targetSdkVersion.apiLevel 23
+            versionCode 1
+            versionName "1.0"
+
+            buildConfigFields {
+                create() {
+                    type "int"
+                    name "VALUE"
+                    value "1"
+                }
+            }
+        }
+        buildTypes {
+            release {
+                minifyEnabled false
+                proguardFiles.add(file('proguard-rules.pro'))
+            }
+        }
+
+        ndk {
+            moduleName "gstplayerwrapper"
+            platformVersion 19
+        }
+
+        productFlavors {
+            create("flavor1") {
+                applicationId "com.app"
+            }
+        }
+
+        // Configures source set directory.
+        sources {
+            main {
+//                jni {
+//                    source {
+//                        srcDirs = ['src/main/jni']
+//                    }
+//                }
+                jniLibs {
+                    dependencies {
+                        library "gst"
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+}
